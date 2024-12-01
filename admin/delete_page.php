@@ -22,6 +22,10 @@ if (isset($_GET['id'])) {
     $stmt->execute(['id' => $pageID]);
 }
 
-header('Location: manage_pages.php');
+// Redirect to the manage pages page with a success message
+$message = urlencode('Page was successfully deleted!');
+$baseUrl = getBaseUrl();
+header("Location: {$baseUrl}/admin/manage_pages.php?success_msg={$message}");
 exit();
+
 ?>

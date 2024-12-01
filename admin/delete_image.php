@@ -20,7 +20,8 @@ if (isset($_GET['id'])) {
         $stmt->execute(['id' => $imageID]);
     }
 }
-
-header('Location: manage_pages.php');
+$baseUrl = getBaseUrl();
+header("Location: {$baseUrl}/admin/manage_pages.php");
 exit();
+
 ?>

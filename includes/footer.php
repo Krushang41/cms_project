@@ -1,4 +1,4 @@
 </div> <!-- End of container -->
-    <script src="../assets/js/scripts.js"></script>
+    <script src="<?php echo $baseUrl; ?>/assets/js/scripts.js"></script>
 </body>
 </html>

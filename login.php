@@ -1,17 +1,6 @@
 <?php
 session_start();
-// Function to get the dynamic base URL
-if (!function_exists('getBaseUrl')) {
-
-    function getBaseUrl() {
-    
-        $baseUrl = 'http://localhost:8080/cms_project';
-        
-        return $baseUrl;
-    }
-    }
-    $baseUrl = getBaseUrl();
-include '../config/db.php';
+include 'config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
@@ -24,12 +13,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user && password_verify($password, $user['PasswordHash'])) {
         $_SESSION['UserID'] = $user['UserID'];
         $_SESSION['IsAdmin'] = $user['IsAdmin'];
-        
-        // Redirect based on role
-        $message = urlencode('You have successfully logged in!');   
-        $baseUrl = getBaseUrl();
-        header("Location: {$baseUrl}/admin/manage_pages.php?success_msg={$message}");
 
+        // Redirect based on role
+        if ($user['IsAdmin']) {
+
+            header("Location: admin/manage_pages.php");
+
+        } else {
+            header("Location: view_pages.php");
+        }
         exit();
     } else {
         $error = "Invalid username or password.";
@@ -41,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>Login</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             height: 100vh;
         }
 
-        .login-container {
+        .form-container {
             max-width: 400px;
             width: 100%;
             background-color: white;
@@ -64,20 +56,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
         }
 
-        .login-container h1 {
+        .form-container h1 {
             font-size: 24px;
             margin-bottom: 20px;
             color: #333;
         }
 
-        .login-container form {
+        .form-container form {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
 
-        .login-container input[type="text"],
-        .login-container input[type="password"] {
+        .form-container input[type="text"],
+        .form-container input[type="password"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -85,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 16px;
         }
 
-        .login-container button {
+        .form-container button {
             padding: 10px 15px;
             background-color: #4CAF50;
             color: white;
@@ -96,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transition: background-color 0.3s;
         }
 
-        .login-container button:hover {
+        .form-container button:hover {
             background-color: #45a049;
         }
 
@@ -106,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: -10px;
         }
 
-        .login-container a {
+        .form-container a {
             font-size: 14px;
             color: #007bff;
             text-decoration: none;
@@ -114,23 +106,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: inline-block;
         }
 
-        .login-container a:hover {
+        .form-container a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>Admin Login</h1>
-        <?php if (isset($error)): ?>
-            <p class="error-message"><?php echo htmlspecialchars($error); ?></p>
-        <?php endif; ?>
-        <form method="post">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
-        <a href="../index.php">Back to Home</a>
-    </div>
+<div class="form-container">
+    <h1>Login</h1>
+    <?php if (isset($error)): ?>
+        <p class="error-message"><?php echo htmlspecialchars($error); ?></p>
+    <?php endif; ?>
+    <form method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+</div>
 </body>
 </html>

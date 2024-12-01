@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$dbname = 'image_compress';
+$dbname = 'cms_project_web';
 $username = 'root';
 $password = '';
 

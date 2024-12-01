@@ -1,12 +1,33 @@
+<?php
+// Function to get the dynamic base URL
+if (!function_exists('getBaseUrl')) {
+
+function getBaseUrl() {
+
+    $baseUrl = 'http://localhost:8080/cms_project';
+    
+    return $baseUrl;
+}
+}
+$baseUrl = getBaseUrl();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/admin_styles.css">
-    <link rel="stylesheet" href="../assets/css/styles.css">
 
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/admin_styles.css">
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </head>
 <body>
     <header class="admin-header">

@@ -49,3 +49,11 @@ $users = $stmt->fetchAll();
     </tbody>
 </table>
 <?php include '../includes/footer.php'; ?>
+<?php
+if (isset($_GET['success_msg'])) {
+    $success_msg = htmlspecialchars($_GET['success_msg']);
+    echo "<script>
+        window.onload = function() { showSuccessToast('{$success_msg}'); }
+    </script>";
+}
+?>
