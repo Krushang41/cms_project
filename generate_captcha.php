@@ -21,11 +21,7 @@ for ($i = 0; $i < 5; $i++) {
     imageline($captcha_image, rand(0, 120), rand(0, 40), rand(0, 120), rand(0, 40), $line_color);
 }
 
-// Use Google Fonts CDN (Roboto)
-$font_url = 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf';
-$font_content = file_get_contents($font_url);
-$temp_font = tempnam(sys_get_temp_dir(), 'font') . '.ttf';
-file_put_contents($temp_font, $font_content);
+
 
 // Add the CAPTCHA text
 imagettftext($captcha_image, 18, rand(-10, 10), 10, 30, $text_color, $temp_font, $captcha_code);
