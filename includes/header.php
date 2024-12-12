@@ -1,18 +1,21 @@
 <?php
-// if sesson not then start
+
+
 if (!session_id()) {
     session_start();
 }
 include 'config/db.php';
-// Function to get the dynamic base URL
+
+
 
     $baseUrl = getBaseUrl();
 
-// Check if the user is logged in
+
 $isLoggedIn = isset($_SESSION['UserID']);
 $isAdmin = isset($_SESSION['IsAdmin']) && $_SESSION['IsAdmin'];
 
-// Fetch categories for the dropdown menu
+
+
 $stmt = $conn->query("SELECT * FROM Categories ORDER BY Name ASC");
 $categories = $stmt->fetchAll();
 ?>
@@ -67,7 +70,8 @@ $categories = $stmt->fetchAll();
                 <div class="dropdown">
                     <a href="#">Categories</a>
                     <div class="dropdown-content">
-                        <!-- all -->
+                      
+                    
                         <a href="<?php echo $baseUrl; ?>/view_pages.php">All</a>
                         <?php foreach ($categories as $category): ?>
                             <a href="<?php echo $baseUrl; ?>/view_pages.php?category_id=<?php echo $category['CategoryID']; ?>">

@@ -5,29 +5,30 @@ include '../config/db.php';
 include '../includes/functions.php';
 
 $pageID = $_GET['id'];
-// Fetch the page details
+
+
 $stmt = $conn->prepare("SELECT * FROM Pages WHERE PageID = :id");
 $stmt->execute(['id' => $pageID]);
 $page = $stmt->fetch();
 
-// Fetch all available categories
+
 $stmt = $conn->prepare("SELECT * FROM Categories ORDER BY Name ASC");
 $stmt->execute();
 $categories = $stmt->fetchAll();
 
-// Fetch categories currently assigned to the page
+
 $stmt = $conn->prepare("SELECT CategoryID FROM PageCategories WHERE PageID = :pageID");
 $stmt->execute(['pageID' => $pageID]);
 $assignedCategories = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-// Handle form submission
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $content = $_POST['content'];
     $imageID = $page['ImageID'];
     $selectedCategories = isset($_POST['categories']) ? $_POST['categories'] : [];
 
-    // Handle Image Upload
+  
     if (!empty($_FILES['image']['tmp_name']) && isImage($_FILES['image']['tmp_name'])) {
         $uploadDir = '../uploads/';
         $fileName = time() . '_' . $_FILES['image']['name'];
@@ -40,29 +41,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Handle Image Deletion
+
     if (isset($_POST['delete_image']) && $page['ImageID']) {
         $stmt = $conn->prepare("DELETE FROM Images WHERE ImageID = :id");
         $stmt->execute(['id' => $page['ImageID']]);
         $imageID = null;
     }
 
-    // Update Page
     $stmt = $conn->prepare("UPDATE Pages SET Title = :title, Content = :content, ImageID = :imageID WHERE PageID = :id");
     $stmt->execute(['title' => $title, 'content' => $content, 'imageID' => $imageID, 'id' => $pageID]);
 
-    // Update Assigned Categories
-    // First, remove all existing categories
+ 
     $stmt = $conn->prepare("DELETE FROM PageCategories WHERE PageID = :pageID");
     $stmt->execute(['pageID' => $pageID]);
 
-    // Insert selected categories
+
     foreach ($selectedCategories as $categoryID) {
         $stmt = $conn->prepare("INSERT INTO PageCategories (PageID, CategoryID) VALUES (:pageID, :categoryID)");
         $stmt->execute(['pageID' => $pageID, 'categoryID' => $categoryID]);
     }
 
-    // Redirect with success message
+
     $message = urlencode("Page '{$title}' was successfully updated!");
 
     $baseUrl = getBaseUrl();
@@ -166,7 +165,7 @@ header("Location: {$baseUrl}/admin/manage_pages.php?success_msg={$message}");
 
 <?php include '../includes/admin_footer.php'; ?>
 
-<!-- Add TinyMCE -->
+
 <script src="https://cdn.tiny.cloud/1/swteaszeemlfhlo7zl8otan8ww8ur1vjttvu236duxr9s88j/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
     tinymce.init({

@@ -9,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $content = $_POST['content'];
     $imageID = null;
 
-    // Handle Image Upload
     if (!empty($_FILES['image']['tmp_name']) && isImage($_FILES['image']['tmp_name'])) {
         $uploadDir = '../uploads/';
         $fileName = time() . '_' . $_FILES['image']['name'];
@@ -22,11 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Insert Page
     $stmt = $conn->prepare("INSERT INTO Pages (Title, Content, ImageID) VALUES (:title, :content, :imageID)");
     $stmt->execute(['title' => $title, 'content' => $content, 'imageID' => $imageID]);
 
-// After successful insertion of the page
 $message = urlencode("Page '{$title}' was successfully added!");
 
 $baseUrl = getBaseUrl();
