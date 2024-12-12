@@ -1,71 +1,144 @@
 <?php
 include 'config/db.php';
 
-// Fetch all categories
+// Pagination settings
+$results_per_page = 10; // Number of results per page
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$offset = ($page - 1) * $results_per_page; // Calculate offset
+
+// Fetch all categories for the dropdown
 $stmt = $conn->query("SELECT * FROM Categories ORDER BY Name ASC");
 $categories = $stmt->fetchAll();
 
-// Fetch pages based on selected category
-$categoryID = isset($_GET['category_id']) ? intval($_GET['category_id']) : null;
+// Handle search and category filtering
+$search_query = isset($_GET['query']) ? trim($_GET['query']) : '';
+$category_id = isset($_GET['category_id']) && is_numeric($_GET['category_id']) ? intval($_GET['category_id']) : null;
 
-if ($categoryID) {
-    // Fetch pages for the selected category
-    $stmt = $conn->prepare("
-        SELECT Pages.*, Images.FilePath AS ImagePath 
-        FROM Pages 
-        LEFT JOIN Images ON Pages.ImageID = Images.ImageID
-        INNER JOIN PageCategories ON Pages.PageID = PageCategories.PageID
-        WHERE PageCategories.CategoryID = :category_id
-    ");
-    $stmt->execute(['category_id' => $categoryID]);
-} else {
-    // Fetch all pages if no category is selected
-    $stmt = $conn->query("
-        SELECT Pages.*, Images.FilePath AS ImagePath 
-        FROM Pages 
-        LEFT JOIN Images ON Pages.ImageID = Images.ImageID
-    ");
+// Base SQL query
+$sql = "
+    SELECT Pages.*, Images.FilePath AS ImagePath 
+    FROM Pages
+    LEFT JOIN Images ON Pages.ImageID = Images.ImageID
+    LEFT JOIN PageCategories ON Pages.PageID = PageCategories.PageID
+    LEFT JOIN Categories ON PageCategories.CategoryID = Categories.CategoryID
+    WHERE 1
+";
+
+$params = [];
+
+// Add search condition
+if (!empty($search_query)) {
+    $sql .= " AND Pages.Title LIKE :query";
+    $params[':query'] = '%' . $search_query . '%';
 }
 
+// Add category filter condition
+if ($category_id) {
+    $sql .= " AND Categories.CategoryID = :category_id";
+    $params[':category_id'] = $category_id;
+}
+
+// Add pagination
+$sql .= " LIMIT :offset, :results_per_page";
+$params[':offset'] = $offset;
+$params[':results_per_page'] = $results_per_page;
+
+// Prepare and execute query
+$stmt = $conn->prepare($sql);
+
+// Bind parameters dynamically
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+}
+
+$stmt->execute();
 $pages = $stmt->fetchAll();
+
+// Count total results for pagination
+$count_sql = "
+    SELECT COUNT(DISTINCT Pages.PageID) AS total
+    FROM Pages
+    LEFT JOIN PageCategories ON Pages.PageID = PageCategories.PageID
+    LEFT JOIN Categories ON PageCategories.CategoryID = Categories.CategoryID
+    WHERE 1
+";
+if (!empty($search_query)) {
+    $count_sql .= " AND Pages.Title LIKE :query";
+}
+if ($category_id) {
+    $count_sql .= " AND Categories.CategoryID = :category_id";
+}
+$count_stmt = $conn->prepare($count_sql);
+
+// Use the same $params array for the count query
+foreach ($params as $key => $value) {
+    if ($key !== ':offset' && $key !== ':results_per_page') {
+        $count_stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+    }
+}
+$count_stmt->execute();
+$total_results = $count_stmt->fetch()['total'];
+$total_pages = ceil($total_results / $results_per_page);
 ?>
 
 <?php include 'includes/header.php'; ?>
-<h1>Available Pages</h1>
 
-<!-- Categories Navigation -->
-<nav>
-    <h2>Filter by Category</h2>
-    <ul>
-        <li><a href="view_pages.php">All Pages</a></li>
+<form method="GET" action="index.php" class="search-form">
+    <input type="text" name="query" placeholder="Search pages..." value="<?php echo htmlspecialchars($search_query); ?>">
+    <select name="category_id">
+        <option value="0">All Categories</option>
         <?php foreach ($categories as $category): ?>
-            <li>
-                <a href="view_pages.php?category_id=<?php echo $category['CategoryID']; ?>">
-                    <?php echo htmlspecialchars($category['Name']); ?>
-                </a>
-            </li>
+            <option value="<?php echo $category['CategoryID']; ?>" <?php echo $category_id == $category['CategoryID'] ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($category['Name']); ?>
+            </option>
         <?php endforeach; ?>
-    </ul>
-</nav>
+    </select>
+    <button type="submit">Search</button>
+</form>
 
-<!-- Pages List -->
-<section>
+<section class="page-list">
     <?php if (count($pages) > 0): ?>
-        <ul>
+        <div class="card-container">
             <?php foreach ($pages as $page): ?>
-                <li>
-                    <h2><?php echo htmlspecialchars($page['Title']); ?></h2>
-                    <?php if ($page['ImagePath']): ?>
-                        <img src="<?php echo $page['ImagePath']; ?>" alt="Page Image" width="200">
-                    <?php endif; ?>
-                    <p><?php echo nl2br(htmlspecialchars($page['Content'])); ?></p>
-                    <a href="view_page.php?page_id=<?php echo $page['PageID']; ?>">Read More</a>
-                </li>
+                <div class="card">
+                   
+                    <?php 
+if (!empty($page['ImagePath'])): 
+    // Remove '../' if it exists in the path
+    $sanitizedPath = str_replace('../', '', $page['ImagePath']); 
+?>
+    <img src="<?php echo $baseUrl . '/' . htmlspecialchars($sanitizedPath); ?>" alt="Page Image" class="card-img">
+<?php else: ?>
+    No Image
+<?php endif; ?>
+                    <div class="card-content">
+                        <h2 class="card-title"><?php echo htmlspecialchars($page['Title']); ?></h2>
+                        <a href="view_page.php?page_id=<?php echo $page['PageID']; ?>" class="card-btn">Read More</a>
+                    </div>
+                </div>
             <?php endforeach; ?>
-        </ul>
+        </div>
     <?php else: ?>
-        <p>No pages found for this category.</p>
+        <p>No pages found.</p>
     <?php endif; ?>
 </section>
+
+<?php if ($total_pages > 1): ?>
+    <div class="pagination">
+        <?php if ($page > 1): ?>
+            <a href="?query=<?php echo urlencode($search_query); ?>&category_id=<?php echo $category_id; ?>&page=<?php echo $page - 1; ?>">Previous</a>
+        <?php endif; ?>
+
+        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+            <a href="?query=<?php echo urlencode($search_query); ?>&category_id=<?php echo $category_id; ?>&page=<?php echo $i; ?>" class="<?php echo $i == $page ? 'active' : ''; ?>">
+                <?php echo $i; ?>
+            </a>
+        <?php endfor; ?>
+
+        <?php if ($page < $total_pages): ?>
+            <a href="?query=<?php echo urlencode($search_query); ?>&category_id=<?php echo $category_id; ?>&page=<?php echo $page + 1; ?>">Next</a>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>

@@ -1,3 +1,10 @@
+<?php include '../config/db.php'; 
+
+    $baseUrl = getBaseUrl();
+
+?>
+
+
 </main>
     <footer class="admin-footer">
         <p>© 2024 CMS Admin Panel. All rights reserved.</p>

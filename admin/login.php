@@ -1,17 +1,11 @@
 <?php
 session_start();
 // Function to get the dynamic base URL
-if (!function_exists('getBaseUrl')) {
 
-    function getBaseUrl() {
-    
-        $baseUrl = 'http://localhost:8080/cms_project';
-        
-        return $baseUrl;
-    }
-    }
-    $baseUrl = getBaseUrl();
 include '../config/db.php';
+
+$baseUrl = getBaseUrl();
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];

@@ -1,14 +1,7 @@
 <?php
-// Function to get the dynamic base URL
-if (!function_exists('getBaseUrl')) {
+// db.php includes the database connection and the getBaseUrl function
+include '../config/db.php';
 
-function getBaseUrl() {
-
-    $baseUrl = 'http://localhost:8080/cms_project';
-    
-    return $baseUrl;
-}
-}
 $baseUrl = getBaseUrl();
 
 ?>

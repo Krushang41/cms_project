@@ -3,39 +3,39 @@ include '../auth/login_check.php';
 include '../auth/is_admin.php';
 include '../config/db.php';
 
-// Get user ID from query parameters
+
 $userID = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Fetch the user details
+
 $stmt = $conn->prepare("SELECT * FROM Users WHERE UserID = :id");
 $stmt->execute(['id' => $userID]);
 $user = $stmt->fetch();
 
 if (!$user) {
-    // Redirect if user not found
+   
     header('Location: manage_users.php');
     exit();
 }
 
 $message = "";
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $isAdmin = isset($_POST['is_admin']) ? 1 : 0;
 
-    // Update password if provided
+    // Update password
     if (!empty($_POST['password'])) {
         $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("UPDATE Users SET Username = :username, Password = :password, IsAdmin = :is_admin WHERE UserID = :id");
+        $stmt = $conn->prepare("UPDATE Users SET Username = :username, PasswordHash = :password, IsAdmin = :is_admin WHERE UserID = :id");
         $stmt->execute(['username' => $username, 'password' => $password, 'is_admin' => $isAdmin, 'id' => $userID]);
     } else {
         $stmt = $conn->prepare("UPDATE Users SET Username = :username, IsAdmin = :is_admin WHERE UserID = :id");
         $stmt->execute(['username' => $username, 'is_admin' => $isAdmin, 'id' => $userID]);
-    }
+    }    
+    
 
     $message = "User updated successfully!";
-    // Redirect after update
+    
     $baseUrl = getBaseUrl();
     header("Location: {$baseUrl}/admin/manage_users.php?success_msg={$message}");
 

@@ -2,17 +2,7 @@
 include '../auth/login_check.php';
 include '../auth/is_admin.php';
 include '../config/db.php';
-// Function to get the dynamic base URL
-if (!function_exists('getBaseUrl')) {
 
-    function getBaseUrl()
-    {
-
-        $baseUrl = 'http://localhost:8080/cms_project';
-
-        return $baseUrl;
-    }
-}
 $baseUrl = getBaseUrl();
 
 

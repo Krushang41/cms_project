@@ -131,9 +131,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container">
     <article>
         <h1><?php echo htmlspecialchars($page['Title']); ?></h1>
-        <?php if ($page['ImagePath']): ?>
-            <img src="<?php echo $page['ImagePath']; ?>" alt="Page Image" width="400">
-        <?php endif; ?>
+      <?php 
+if (!empty($page['ImagePath'])): 
+    // Remove '../' if it exists in the path
+    $sanitizedPath = str_replace('../', '', $page['ImagePath']); 
+?>
+    <img src="<?php echo $baseUrl . '/' . htmlspecialchars($sanitizedPath); ?>" alt="Page Image" width="400">
+<?php else: ?>
+    No Image
+<?php endif; ?>
         <p><?php echo nl2br(htmlspecialchars($page['Content'])); ?></p>
     </article>
 

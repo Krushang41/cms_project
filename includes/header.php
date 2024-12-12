@@ -5,15 +5,7 @@ if (!session_id()) {
 }
 include 'config/db.php';
 // Function to get the dynamic base URL
-if (!function_exists('getBaseUrl')) {
 
-    function getBaseUrl() {
-    
-        $baseUrl = 'http://localhost:8080/cms_project';
-        
-        return $baseUrl;
-    }
-    }
     $baseUrl = getBaseUrl();
 
 // Check if the user is logged in
@@ -75,6 +67,8 @@ $categories = $stmt->fetchAll();
                 <div class="dropdown">
                     <a href="#">Categories</a>
                     <div class="dropdown-content">
+                        <!-- all -->
+                        <a href="<?php echo $baseUrl; ?>/view_pages.php">All</a>
                         <?php foreach ($categories as $category): ?>
                             <a href="<?php echo $baseUrl; ?>/view_pages.php?category_id=<?php echo $category['CategoryID']; ?>">
                                 <?php echo htmlspecialchars($category['Name']); ?>
