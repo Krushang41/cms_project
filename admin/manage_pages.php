@@ -6,20 +6,18 @@ include '../config/db.php';
 $baseUrl = getBaseUrl();
 
 
-// Check for sorting parameters
+
 $sort_by = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'Title';
 $order = isset($_GET['order']) && $_GET['order'] === 'desc' ? 'DESC' : 'ASC';
 
-// Validate sort_by parameter
+
 $valid_columns = ['Title', 'CreatedAt', 'UpdatedAt'];
 if (!in_array($sort_by, $valid_columns)) {
-    $sort_by = 'Title'; // Default column
+    $sort_by = 'Title';
 }
 
-// Check if a search query is submitted
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-// Fetch pages with optional search and sorting
 $sql = "SELECT Pages.*, Images.FilePath AS ImagePath FROM Pages 
         LEFT JOIN Images ON Pages.ImageID = Images.ImageID";
 if (!empty($search_query)) {
@@ -41,7 +39,6 @@ $pages = $stmt->fetchAll();
 <h2>Manage Pages</h2>
 <a href="<?php echo $baseUrl; ?>/admin/add_page.php" class="btn">Add New Page</a>
 
-<!-- Search Form -->
 <div style="text-align: right; margin-bottom: 20px;">
     <form method="GET" action="" style="display: inline-block;">
         <input type="text" name="search" value="<?php echo htmlspecialchars($search_query); ?>" placeholder="Search Pages" style="padding: 5px;">
@@ -80,7 +77,7 @@ $pages = $stmt->fetchAll();
                     <td> 
                     <?php 
 if (!empty($page['ImagePath'])): 
-    // Remove '../' if it exists in the path
+   
     $sanitizedPath = str_replace('../', '', $page['ImagePath']); 
 ?>
     <img src="<?php echo $baseUrl . '/' . htmlspecialchars($sanitizedPath); ?>" alt="Page Image" width="50px">

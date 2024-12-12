@@ -11,7 +11,6 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// Function to get the dynamic base URL
 if (!function_exists('getBaseUrl')) {
 
     function getBaseUrl()

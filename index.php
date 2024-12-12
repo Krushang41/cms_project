@@ -1,20 +1,20 @@
 <?php
 include 'config/db.php';
 
-// Pagination settings
-$results_per_page = 10; // Number of results per page
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$offset = ($page - 1) * $results_per_page; // Calculate offset
 
-// Fetch all categories for the dropdown
+$results_per_page = 10; 
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$offset = ($page - 1) * $results_per_page; 
+
+
 $stmt = $conn->query("SELECT * FROM Categories ORDER BY Name ASC");
 $categories = $stmt->fetchAll();
 
-// Handle search and category filtering
+
 $search_query = isset($_GET['query']) ? trim($_GET['query']) : '';
 $category_id = isset($_GET['category_id']) && is_numeric($_GET['category_id']) ? intval($_GET['category_id']) : null;
 
-// Base SQL query
+
 $sql = "
     SELECT Pages.*, Images.FilePath AS ImagePath 
     FROM Pages
@@ -26,27 +26,29 @@ $sql = "
 
 $params = [];
 
-// Add search condition
+
 if (!empty($search_query)) {
     $sql .= " AND Pages.Title LIKE :query";
     $params[':query'] = '%' . $search_query . '%';
 }
 
-// Add category filter condition
+
 if ($category_id) {
     $sql .= " AND Categories.CategoryID = :category_id";
     $params[':category_id'] = $category_id;
 }
 
-// Add pagination
+
 $sql .= " LIMIT :offset, :results_per_page";
 $params[':offset'] = $offset;
 $params[':results_per_page'] = $results_per_page;
 
-// Prepare and execute query
+
+
+
 $stmt = $conn->prepare($sql);
 
-// Bind parameters dynamically
+
 foreach ($params as $key => $value) {
     $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
 }
@@ -54,7 +56,7 @@ foreach ($params as $key => $value) {
 $stmt->execute();
 $pages = $stmt->fetchAll();
 
-// Count total results for pagination
+
 $count_sql = "
     SELECT COUNT(DISTINCT Pages.PageID) AS total
     FROM Pages
@@ -70,7 +72,8 @@ if ($category_id) {
 }
 $count_stmt = $conn->prepare($count_sql);
 
-// Use the same $params array for the count query
+
+
 foreach ($params as $key => $value) {
     if ($key !== ':offset' && $key !== ':results_per_page') {
         $count_stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
@@ -104,7 +107,7 @@ $total_pages = ceil($total_results / $results_per_page);
                    
                     <?php 
 if (!empty($page['ImagePath'])): 
-    // Remove '../' if it exists in the path
+   
     $sanitizedPath = str_replace('../', '', $page['ImagePath']); 
 ?>
     <img src="<?php echo $baseUrl . '/' . htmlspecialchars($sanitizedPath); ?>" alt="Page Image" class="card-img">

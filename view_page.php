@@ -4,7 +4,7 @@ session_start();
 
 $pageID = isset($_GET['page_id']) ? intval($_GET['page_id']) : 0;
 
-// Fetch the page details
+
 $stmt = $conn->prepare("SELECT Pages.*, Images.FilePath AS ImagePath FROM Pages LEFT JOIN Images ON Pages.ImageID = Images.ImageID WHERE PageID = :page_id");
 $stmt->execute(['page_id' => $pageID]);
 $page = $stmt->fetch();
@@ -14,7 +14,8 @@ if (!$page) {
     exit();
 }
 
-// Handle comment submission
+
+
 $message = '';
 $userInput = [
     'username' => '',
@@ -25,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $commentText = trim($_POST['comment']);
     $captchaInput = trim($_POST['captcha']);
 
-    // Preserve input for user retry
+    
     $userInput['username'] = $userName;
     $userInput['comment'] = $commentText;
 
@@ -34,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("INSERT INTO Comments (PageID, UserName, CommentText, CreatedAt, IsVisible) VALUES (:page_id, :username, :comment, NOW(), TRUE)");
             $stmt->execute(['page_id' => $pageID, 'username' => $userName, 'comment' => $commentText]);
             $message = "Your comment has been submitted successfully!";
-            $userInput = []; // Clear input after successful submission
+            $userInput = [];
         } else {
             $message = "Please fill out all fields.";
         }
@@ -42,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Invalid CAPTCHA. Please try again.";
     }
 
-    // Regenerate CAPTCHA for the next attempt
     unset($_SESSION['captcha']);
 }
 ?>
@@ -133,7 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1><?php echo htmlspecialchars($page['Title']); ?></h1>
       <?php 
 if (!empty($page['ImagePath'])): 
-    // Remove '../' if it exists in the path
+ 
+    
     $sanitizedPath = str_replace('../', '', $page['ImagePath']); 
 ?>
     <img src="<?php echo $baseUrl . '/' . htmlspecialchars($sanitizedPath); ?>" alt="Page Image" width="400">
@@ -146,7 +147,8 @@ if (!empty($page['ImagePath'])):
     <section class="comments-section">
         <h2>Comments</h2>
 
-        <!-- Comment Submission Form -->
+
+        
         <form method="POST" class="comment-form">
             <div class="form-group">
                 <label for="username">Name</label>
@@ -164,12 +166,13 @@ if (!empty($page['ImagePath'])):
             <button type="submit" class="btn-submit">Submit Comment</button>
         </form>
 
-        <!-- Display Message -->
+        
         <?php if (!empty($message)): ?>
             <p class="message"><?php echo htmlspecialchars($message); ?></p>
         <?php endif; ?>
 
-        <!-- Display Comments -->
+
+        
         <div class="comments-list">
             <?php
             $stmt = $conn->prepare("SELECT * FROM Comments WHERE PageID = :page_id AND IsVisible = TRUE ORDER BY CreatedAt DESC");
