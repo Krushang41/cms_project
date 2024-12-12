@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $isAdmin = isset($_POST['is_admin']) ? 1 : 0;
 
-    // Update password
+  
     if (!empty($_POST['password'])) {
         $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE Users SET Username = :username, PasswordHash = :password, IsAdmin = :is_admin WHERE UserID = :id");

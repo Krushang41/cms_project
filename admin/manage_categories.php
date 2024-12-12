@@ -5,19 +5,22 @@ include '../config/db.php';
 
 $message = "";
 
-// Handle form submission for adding/updating categories
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category_name = trim($_POST['category_name']);
     $category_id = isset($_POST['category_id']) ? intval($_POST['category_id']) : null;
 
     if (!empty($category_name)) {
         if ($category_id) {
-            // Update the existing category
+           
+            
             $stmt = $conn->prepare("UPDATE Categories SET Name = :name WHERE CategoryID = :id");
             $stmt->execute(['name' => $category_name, 'id' => $category_id]);
             $message = "Category updated successfully!";
         } else {
-            // Insert a new category
+           
+            
             $stmt = $conn->prepare("INSERT INTO Categories (Name) VALUES (:name)");
             $stmt->execute(['name' => $category_name]);
             $message = "Category added successfully!";
@@ -25,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all categories for display
 $stmt = $conn->prepare("SELECT * FROM Categories ORDER BY Name ASC");
 $stmt->execute();
 $categories = $stmt->fetchAll();

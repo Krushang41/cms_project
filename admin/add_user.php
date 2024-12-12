@@ -5,19 +5,22 @@ include '../config/db.php';
 
 $message = "";
 
-// Handle form submission
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
     $isAdmin = isset($_POST['is_admin']) ? 1 : 0;
 
-    // Check if username already exists
+
+    
     $stmt = $conn->prepare("SELECT * FROM Users WHERE Username = :username");
     $stmt->execute(['username' => $username]);
     if ($stmt->rowCount() > 0) {
         $message = "Username already exists!";
     } else {
-        // Insert the new user
+      
+        
         $stmt = $conn->prepare("INSERT INTO Users (Username, PasswordHash, IsAdmin) VALUES (:username, :password, :is_admin)");
         $stmt->execute(['username' => $username, 'password' => $password, 'is_admin' => $isAdmin]);
         $message = "User added successfully!";

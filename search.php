@@ -2,17 +2,19 @@
 include 'config/db.php';
 include 'includes/header.php';
 
-// Get search query and pagination inputs
+
 $search_query = isset($_GET['query']) ? trim($_GET['query']) : '';
 $category_id = isset($_GET['category_id']) ? intval($_GET['category_id']) : 0;
-$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1; // Ensure page is at least 1
-$results_per_page = 5; // Number of results per page
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1; 
+$results_per_page = 5; 
 $offset = ($page - 1) * $results_per_page;
 
-// Fetch categories for the dropdown
+
+
 $stmt = $conn->query("SELECT * FROM Categories ORDER BY Name ASC");
 $categories = $stmt->fetchAll();
-// Build the main query
+
+
 $sql = "
     SELECT 
         Pages.PageID, 
@@ -34,17 +36,17 @@ if ($category_id) {
     $params[':category_id'] = $category_id;
 }
 
-// Add pagination to the query
+
 $sql .= " LIMIT :offset, :results_per_page";
 $params[':offset'] = $offset;
 $params[':results_per_page'] = $results_per_page;
 
-// Execute the query
+
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $results = $stmt->fetchAll();
 
-// Count total results for pagination
+
 $count_sql = "
     SELECT COUNT(DISTINCT Pages.PageID) AS total
     FROM Pages
@@ -64,7 +66,7 @@ $total_pages = ceil($total_results / $results_per_page);
 <div class="container">
     <h1>Search Pages</h1>
     
-    <!-- Search Form -->
+ 
     <form method="GET" action="search.php" class="search-form">
         <input type="text" name="query" placeholder="Search..." value="<?php echo htmlspecialchars($search_query); ?>" required>
         <select name="category_id">
@@ -78,7 +80,6 @@ $total_pages = ceil($total_results / $results_per_page);
         <button type="submit">Search</button>
     </form>
 
-    <!-- Results -->
     <?php if (!empty($results)): ?>
         <ul class="search-results">
             <?php foreach ($results as $result): ?>
@@ -90,7 +91,7 @@ $total_pages = ceil($total_results / $results_per_page);
             <?php endforeach; ?>
         </ul>
 
-        <!-- Pagination -->
+     
         <div class="pagination">
             <?php if ($page > 1): ?>
                 <a href="?query=<?php echo urlencode($search_query); ?>&category_id=<?php echo $category_id; ?>&page=<?php echo $page - 1; ?>">Previous</a>

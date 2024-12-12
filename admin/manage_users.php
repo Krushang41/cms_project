@@ -3,11 +3,10 @@ include '../auth/login_check.php';
 include '../auth/is_admin.php';
 include '../config/db.php';
 
-// Handle user deletion
+
 if (isset($_GET['delete'])) {
     $userID = $_GET['delete'];
 
-    // Prevent self-deletion
     if ($userID != $_SESSION['UserID']) {
         $stmt = $conn->prepare("DELETE FROM Users WHERE UserID = :id");
         $stmt->execute(['id' => $userID]);
@@ -16,7 +15,7 @@ if (isset($_GET['delete'])) {
     exit();
 }
 
-// Fetch all users
+
 $stmt = $conn->query("SELECT * FROM Users");
 $users = $stmt->fetchAll();
 ?>

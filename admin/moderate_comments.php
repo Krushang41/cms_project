@@ -3,20 +3,20 @@ include '../auth/login_check.php';
 include '../auth/is_admin.php';
 include '../config/db.php';
 
-// Get the page ID from the query parameter
+
 $pageID = isset($_GET['page_id']) ? intval($_GET['page_id']) : 0;
 
-// Fetch the page details
+
 $stmt = $conn->prepare("SELECT Title FROM Pages WHERE PageID = :pageID");
 $stmt->execute(['pageID' => $pageID]);
 $page = $stmt->fetch();
 
-// Fetch comments for the page
+
 $stmt = $conn->prepare("SELECT * FROM Comments WHERE PageID = :pageID ORDER BY CreatedAt DESC");
 $stmt->execute(['pageID' => $pageID]);
 $comments = $stmt->fetchAll();
 
-// Handle moderation actions
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $comment_id = intval($_POST['comment_id']);
     $action = $_POST['action'];
@@ -31,7 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
         $baseUrl = getBaseUrl();
     header("Location: {$baseUrl}/admin/moderate_comments.php?page_id=$pageID");
-    // header("Location: moderate_comments.php?page_id=$pageID");
+  
+    
     exit();
 }
 ?>
