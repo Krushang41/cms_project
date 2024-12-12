@@ -126,6 +126,7 @@ $categories = $stmt->fetchAll();
     </style>
 </head>
 <body>
+
     <div class="form-container">
         <h2>Manage Categories</h2>
         <?php if (!empty($message)): ?>
@@ -145,6 +146,7 @@ $categories = $stmt->fetchAll();
             <thead>
                 <tr>
                     <th>Name</th>
+                    
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -159,6 +161,7 @@ $categories = $stmt->fetchAll();
                 <?php endforeach; ?>
                 <?php if (empty($categories)): ?>
                     <tr>
+                        
                         <td colspan="2">No categories found.</td>
                     </tr>
                 <?php endif; ?>
