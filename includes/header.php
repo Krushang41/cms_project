@@ -69,11 +69,7 @@ $categories = $stmt->fetchAll();
                     <div class="dropdown-content">
                         <!-- all -->
                         <a href="<?php echo $baseUrl; ?>/view_pages.php">All</a>
-                        <?php foreach ($categories as $category): ?>
-                            <a href="<?php echo $baseUrl; ?>/view_pages.php?category_id=<?php echo $category['CategoryID']; ?>">
-                                <?php echo htmlspecialchars($category['Name']); ?>
-                            </a>
-                        <?php endforeach; ?>
+                       
                     </div>
                 </div>
                 <a href="<?php echo $baseUrl; ?>/logout.php">Logout</a>

@@ -91,7 +91,11 @@ if (!empty($page['ImagePath'])):
                     </td>
                     <td><?php echo htmlspecialchars($page['CreatedAt']); ?></td>
                     <td><?php echo htmlspecialchars($page['UpdatedAt']); ?></td>
-                  
+                    <td>
+                        <a href="<?php echo $baseUrl; ?>/admin/edit_page.php?id=<?php echo $page['PageID']; ?>" class="btn">Edit</a>
+                        <a href="<?php echo $baseUrl; ?>/admin/delete_page.php?id=<?php echo $page['PageID']; ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this page?');">Delete</a>
+                        <a href="<?php echo $baseUrl; ?>/admin/moderate_comments.php?page_id=<?php echo $page['PageID']; ?>" class="btn btn-info">View Comments</a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
