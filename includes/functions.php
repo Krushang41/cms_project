@@ -5,6 +5,7 @@ function isImage($filePath) {
 }
 
 function resizeImage($source, $destination, $maxWidth, $maxHeight) {
+
     $info = getimagesize($source);
     list($width, $height) = $info;
 
@@ -21,6 +22,8 @@ function resizeImage($source, $destination, $maxWidth, $maxHeight) {
         $image = imagecreatefromgif($source);
     }
 
+
+
     $newImage = imagecreatetruecolor($newWidth, $newHeight);
     imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 
@@ -36,6 +39,7 @@ function resizeImage($source, $destination, $maxWidth, $maxHeight) {
 }
 
 function logAction($userID, $action) {
+    
     global $conn;
     $stmt = $conn->prepare("INSERT INTO Logs (UserID, Action) VALUES (:userID, :action)");
     $stmt->execute(['userID' => $userID, 'action' => $action]);
