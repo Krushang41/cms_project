@@ -15,7 +15,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute(['username' => $username]);
     $user = $stmt->fetch();
 
-    
+    if ($user && password_verify($password, $user['PasswordHash'])) {
+        $_SESSION['UserID'] = $user['UserID'];
+        $_SESSION['IsAdmin'] = $user['IsAdmin'];
+        
+        // Redirect based on role
+        $message = urlencode('You have successfully logged in!');   
+        $baseUrl = getBaseUrl();
+        header("Location: {$baseUrl}/admin/manage_pages.php?success_msg={$message}");
+
+        exit();
+    } else {
+        $error = "Invalid username or password.";
+    }
 }
 ?>
 <!DOCTYPE html>
